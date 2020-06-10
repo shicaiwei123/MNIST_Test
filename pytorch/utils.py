@@ -137,6 +137,7 @@ def train_base(model, cost, optimizer, train_loader, test_loader, args):
     log_list = []  # 需要保存的log数据列表
 
     epoch = 0
+    accuracy_best=0
 
     # 如果是重新训练的过程,那么就读取之前训练的状态
     if args.retrain:
@@ -182,11 +183,13 @@ def train_base(model, cost, optimizer, train_loader, test_loader, args):
 
         # 测试模型
         accuracy_test = calc_accuracy(model, loader=test_loader)
+        if accuracy_test>accuracy_best:
+            accuracy_best=accuracy_test
         log_list.append(train_loss / len(train_loader))
         log_list.append(accuracy_test)
         print(
-            "Epoch {} accuracy: loss={:.5f}, accuracy_test={:.5f}".format(epoch, train_loss / len(train_loader),
-                                                                          accuracy_test))
+            "Epoch {}, loss={:.5f}, accuracy_test={:.5f},  accuracy_best={:.5f}".format(epoch, train_loss / len(train_loader),
+                                                                          accuracy_test, accuracy_best))
         train_loss = 0
 
         if args.lrcos:
