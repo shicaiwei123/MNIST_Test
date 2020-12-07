@@ -16,6 +16,7 @@ def train_mnist(args):  # 定义每个epoch的训练细节
     # 定义数据
 
     train_loader = get_mnist_loader(train=True, batch_size=args.batch_size)
+    test_loader = get_mnist_loader(train=False, batch_size=args.batch_size)
 
     # 定义模型
     # 实例化模型并且打印
