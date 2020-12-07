@@ -1,4 +1,5 @@
 import sys
+
 sys.path.append('..')
 import torch
 import torch.nn as nn
@@ -10,12 +11,11 @@ from lib.model_utils import get_cafar10_loader, get_mnist_loader, train_base, te
 from torchtoolbox.tools import mixup_criterion, mixup_data
 
 
-def train_mnist():  # 定义每个epoch的训练细节
+def train_mnist(args):  # 定义每个epoch的训练细节
 
     # 定义数据
 
     train_loader = get_mnist_loader(train=True, batch_size=args.batch_size)
-    test_loader = get_mnist_loader(train=False, batch_size=args.batch_size)
 
     # 定义模型
     # 实例化模型并且打印
@@ -39,7 +39,7 @@ def train_mnist():  # 定义每个epoch的训练细节
                args=args)
 
 
-def test_mnist(model_path, cost, test_loader):
+def test_mnist(args):
     '''
 
     :param model_path: 要测试的模型的参数保存位置
@@ -47,11 +47,15 @@ def test_mnist(model_path, cost, test_loader):
     :param test_loader:测试数据集
     :return:
     '''
+    test_loader = get_mnist_loader(train=False, batch_size=args.batch_size)
+
+    cost = nn.CrossEntropyLoss() # 同train
 
     # 模型初始化
     model = C_CNN_Net()
 
     # 参数加载
+    model_path = args.model_root + '/' + args.name + '_best.pth'
     state_read = torch.load(model_path)
     model = model.load_state_dict(state_read['model_sate'])
 
@@ -60,7 +64,6 @@ def test_mnist(model_path, cost, test_loader):
 
 
 if __name__ == '__main__':
-    train_mnist()
+    train_mnist(args)
 
-    model_path=args.
-    test_mnist()
+    test_mnist(args)
