@@ -27,17 +27,6 @@ def get_mnist_loader(train=True, batch_size=256):
     return loader
 
 
-def get_mean_std(dataset, ratio=1):
-    """Get mean and std by sample ratio
-    """
-    dataloader = torch.utils.data.DataLoader(dataset, batch_size=int(len(dataset) * ratio),
-                                             shuffle=True, num_workers=10)
-    train = iter(dataloader).next()[0]  # 一个batch的数据
-    mean = np.mean(train.numpy(), axis=(0, 2, 3))
-    std = np.std(train.numpy(), axis=(0, 2, 3))
-    return mean, std
-
-
 def get_cafar10_loader(train=True, batch_size=1):
     """
     :param train: train or test fold?
@@ -111,8 +100,7 @@ def train_base(model, cost, optimizer, train_loader, test_loader, args):
     # 初始化,打开定时器,创建保存位置
     start = time.time()
 
-    models_dir = args.model_root + args.model_name
-    log_dir = args.log_root + args.log_name
+    log_dir = args.log_root + '/' + args.log_name + '.csv'
 
     # 保存argv参数
     with open(log_dir, 'a+', newline='') as f:
@@ -137,10 +125,12 @@ def train_base(model, cost, optimizer, train_loader, test_loader, args):
     log_list = []  # 需要保存的log数据列表
 
     epoch = 0
-    accuracy_best=0
+    accuracy_best = 0
 
     # 如果是重新训练的过程,那么就读取之前训练的状态
     if args.retrain:
+        models_dir = args.model_root + '/' + args.model_name + '.pt'
+
         if not os.path.exists(models_dir):
             print("no trained model")
         else:
@@ -183,13 +173,16 @@ def train_base(model, cost, optimizer, train_loader, test_loader, args):
 
         # 测试模型
         accuracy_test = calc_accuracy(model, loader=test_loader)
-        if accuracy_test>accuracy_best:
-            accuracy_best=accuracy_test
+        if accuracy_test > accuracy_best:
+            accuracy_best = accuracy_test
+            models_dir = args.model_root + '/' + args.model_name + '_best.pth'
+            torch.save(model.state_dict(), models_dir)
         log_list.append(train_loss / len(train_loader))
         log_list.append(accuracy_test)
         print(
-            "Epoch {}, loss={:.5f}, accuracy_test={:.5f},  accuracy_best={:.5f}".format(epoch, train_loss / len(train_loader),
-                                                                          accuracy_test, accuracy_best))
+            "Epoch {}, loss={:.5f}, accuracy_test={:.5f},  accuracy_best={:.5f}".format(epoch,
+                                                                                        train_loss / len(train_loader),
+                                                                                        accuracy_test, accuracy_best))
         train_loss = 0
 
         if args.lrcos:
@@ -203,6 +196,7 @@ def train_base(model, cost, optimizer, train_loader, test_loader, args):
                 "optim_state": optimizer.state_dict(),
                 "args": args
             }
+            models_dir = args.model_root + '/' + args.model_name + '.pth'
             torch.save(train_state, models_dir)
 
         # 保存log

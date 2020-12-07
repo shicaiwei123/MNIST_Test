@@ -25,8 +25,7 @@ parser.add_argument('--mixup', type=bool, default=False, help='using mixup or no
 parser.add_argument('--mixup_alpha', type=float, default=0.2)
 parser.add_argument('--retrain', type=bool, default=False, help='Separate training for the same training process')
 parser.add_argument('--model_root', type=str, default='./output/model/')
-parser.add_argument('--model_name', type=str, default='mnist_cnn_best.pt')
 parser.add_argument('--log_root', type=str, default='./output/log/')
-parser.add_argument('--log_name', type=str, default='mnist_cnn_best.csv')
+parser.add_argument('--name', type=str, default='mnist_cnn_best')
 
 args = parser.parse_args()

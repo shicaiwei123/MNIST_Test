@@ -1,10 +1,12 @@
+import sys
+sys.path.append('..')
 import torch
 import torch.nn as nn
-
-from config import *
-from models.model_net import C_CNN_Net
 import time
-from utils import get_cafar10_loader, get_mnist_loader, train_base, test_base
+import torch.optim as optim
+from configuration.config import args
+from models.model_net import C_CNN_Net
+from lib.model_utils import get_cafar10_loader, get_mnist_loader, train_base, test_base
 from torchtoolbox.tools import mixup_criterion, mixup_data
 
 
@@ -45,14 +47,20 @@ def test_mnist(model_path, cost, test_loader):
     :param test_loader:测试数据集
     :return:
     '''
-    # 模型加载
-    state_read = torch.load(model_path)
+
+    # 模型初始化
     model = C_CNN_Net()
+
+    # 参数加载
+    state_read = torch.load(model_path)
     model = model.load_state_dict(state_read['model_sate'])
 
+    # 测试
     test_base(model, cost=cost, test_loader=test_loader)
 
 
 if __name__ == '__main__':
     train_mnist()
-# test()
+
+    model_path=args.
+    test_mnist()
