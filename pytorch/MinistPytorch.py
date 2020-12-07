@@ -8,14 +8,16 @@ import torch.optim as optim
 import os
 import numpy as np
 
-# os.environ['CUDA_VISIBLE_DEVICES']='1'
+
+# os.environ['CUDA_VISIBLE_DEVICES']='1'   # 指定用于训练的GPU，否则默认是第0块GPU
 
 # 训练参数
 
 # Hyper Parameters
 
-EPOCH = 5  # 训练的轮数,这里只迭代一轮
+EPOCH = 5  # 训练的轮数,这里只迭代一五轮
 LR = 0.001  # 学习率
+momentum=0.90
 batch_size = 32  # 每次训练的时候,放入多少张图片或者是样本
 
 # 读取数据
@@ -41,7 +43,6 @@ test_loader = torch.utils.data.DataLoader(dataset=data_test,
 
 
 # 定义网络
-# 基于参数和传播算法
 class C_CNN_Net(torch.nn.Module):
     def __init__(self):
         super(C_CNN_Net, self).__init__()
@@ -57,7 +58,7 @@ class C_CNN_Net(torch.nn.Module):
 
     def forward(self, x):
         x = self.conv1(x)
-        x = x.view(-1, 14 * 14 * 128)
+        x = x.view(-1, 14 * 14 * 128)    # 将输出的特征图展开成一维向量
         x = self.dense(x)
         return x
 
@@ -73,7 +74,7 @@ if torch.cuda.is_available():
 
 # 训练和测试
 cost = torch.nn.CrossEntropyLoss()
-optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.5)  # 初始化优化器 model.train()
+optimizer = optim.SGD(model.parameters(), lr=LR, momentum=momentum)  # 初始化优化器 model.train()
 
 log_interval = 10  # 每10个batch输出一次信息
 
@@ -88,7 +89,7 @@ def train(epoch):  # 定义每个epoch的训练细节
         for batch_idx, (data, target) in enumerate(train_loader):
             batch_num += 1
             if torch.cuda.is_available():
-                data, target = data.cuda(), target.cuda()
+                data, target = data.cuda(), target.cuda()    # 数据迁移到GPU上
             optimizer.zero_grad()  # 优化器梯度初始化为零,不然会累加之前的梯度
 
             output = model(data)  # 把数据输入网络并得到输出，即进行前向传播
@@ -147,6 +148,7 @@ def test():
         test_loss, correct, len(test_loader.dataset),
         100. * correct / len(test_loader.dataset)))
 
+if __name__ == '__main__':
 
-train(EPOCH)
-# test()
+    train(EPOCH)
+    test()
