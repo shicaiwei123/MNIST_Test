@@ -18,7 +18,7 @@ import numpy as np
 EPOCH = 5  # 训练的轮数,这里只迭代一五轮
 LR = 0.001  # 学习率
 momentum=0.90
-batch_size = 32  # 每次训练的时候,放入多少张图片或者是样本
+batch_size = 200  # 每次训练的时候,放入多少张图片或者是样本
 
 # 读取数据
 data_train = datasets.MNIST(root='./data/',  # 数据集的目录
